@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Animated Betting Site</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    margin: 0; padding: 0;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+    color: #f0f0f0;
+    overflow-x: hidden;
+  }
+  #container {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(20, 30, 48, 0.85);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 40px #00ffe7;
+    animation: fadeIn 1s ease forwards;
+  }
+  h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 8px #00ffe7;
+  }
+  input, select, button {
+    width: 100%;
+    padding: 14px 18px;
+    margin: 10px 0 20px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    background: #162a4f;
+    color: #e0e0e0;
+    box-shadow: inset 0 0 10px #00ffe7;
+  }
+  input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 12px #00ffe7;
+    background: #0b1931;
+    color: #00ffe7;
+  }
+  button {
+    background: #00ffe7;
+    color: #162a4f;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 20px #00ffe7aa;
+    user-select: none;
+  }
+  button:hover {
+    background: #00d9cc;
+  }
+  #wallet {
+    text-align: center;
+    background: #011627;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #00ffe7;
+    box-shadow: 0 0 20px #00ffe7;
+    margin-bottom: 25px;
+  }
+  #walletControls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  #walletControls button {
+    width: 48%;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 10px;
+  }
+  #authMsg, #message, #result {
+    text-align: center;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  #authMsg {
+    color: #ffb347;
+  }
+  #message, #result {
+    font-size: 20px;
+  }
+  .green {
+    background-color: #00ff7fcc;
+    color: #003300;
+    text-shadow: 0 1px 2px #005500;
+  }
+  .red {
+    background-color: #ff4040cc;
+    color: #330000;
+    text-shadow: 0 1px 2px #660000;
+  }
+  .hidden {
+    display: none;
+  }
+  /* 3D animation for winning number */
+  #winningNumber {
+    font-size: 80px;
+    font-weight: 900;
+    color: #00ffe7;
+    text-align: center;
+    margin: 40px 0 30px 0;
+    perspective: 1000px;
+  }
+  #winningNumber.animate {
+    animation: popUp3D 1s ease forwards;
+  }
+  @keyframes popUp3D {
+    0% {
+      transform: translateY(50px) rotateX(90deg);
+      opacity: 0;
+      filter: drop-shadow(0 0 0 #00ffe7);
+    }
+    50% {
+      transform: translateY(-20px) rotateX(-15deg);
+      opacity: 1;
+      filter: drop-shadow(0 0 15px #00ffe7);
+    }
+    100% {
+      transform: translateY(0) rotateX(0);
+      opacity: 1;
+      filter: drop-shadow(0 0 20px #00ffe7);
+    }
+  }
+  /* Fade-in animations for whole site */
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+
+  <h1>🔥CM SATTA STAR 🔥</h1>
+
+  <!-- LOGIN / REGISTER -->
+  <div id="auth">
+    <h2>Register / Login</h2>
+    <input type="text" id="fullname" placeholder="Enter your full name" autocomplete="off" />
+    <input type="text" id="username" placeholder="Choose your username" autocomplete="off" />
+    <input type="tel" id="mobile" placeholder="Enter your 10-digit mobile number" autocomplete="off" />
+    <button onclick="loginOrRegister()">Register / Login</button>
+    <div id="authMsg"></div>
+  </div>
+
+  <!-- GAME SECTION -->
+  <div id="game" class="hidden">
+    <div id="wallet">
+      Wallet Balance: $<span id="balance">100.00</span>
+    </div>
+    <div id="walletControls">
+      <button onclick="addCash()">Add Cash</button>
+      <button onclick="withdrawCash()">Withdraw</button>
+    </div>
+
+    <label for="betAmount">Bet Amount ($):</label>
+    <input type="number" id="betAmount" min="1" placeholder="Enter bet amount" />
+
+    <label for="pickNumber">Pick a number (1 to 6):</label>
+    <select id="pickNumber">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3" selected>3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+    </select>
+
+    <button onclick="placeBet()">Place Bet</button>
+
+    <div id="message"></div>
+
+    <!-- Winning Number with 3D Animation -->
+    <div id="winningNumber" class="hidden"></div>
+
+    <div id="result"></div>
+
+    <button onclick="logout()">Logout</button>
+  </div>
+
+</div>
+
+<script>
+  let currentUser = null;
+  const usersKey = 'bettingSiteUsers';
+
+  // Get users from localStorage
+  function getUsers() {
+    return JSON.parse(localStorage.getItem(usersKey) || '{}');
+  }
+
+  // Save users to localStorage
+  function saveUsers(users) {
+    localStorage.setItem(usersKey, JSON.stringify(users));
+  }
+
+  // Validate mobile number: exactly 10 digits
+  function validateMobile(mobile) {
+    return /^[0-9]{10}$/.test(mobile);
+  }
+
+  // Register or Login user
+  function loginOrRegister() {
+    const fullname = document.getElementById('fullname').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+    const authMsg = document.getElementById('authMsg');
+
+    if (!fullname) {
+      authMsg.textContent = 'Please enter your full name!';
+      authMsg.style.color = '#ffbb33';
+      return;
+    }
+    if (!username) {
+      authMsg.textContent = 'Please enter a username!';
+      authMsg.style.color = '#ffbb33';
+      return;
+    }
+    if (!validateMobile(mobile)) {
+      authMsg.textContent = 'Please enter a valid 10-digit mobile number!';
+      authMsg.style.color = '#ffbb33';
+      return;
+    }
+
+    let users = getUsers();
+
+    if (!users[username]) {
+      // Register new user
+      users[username] = {
+        fullname,
+        mobile,
+        wallet: 100.00
+      };
+      currentUser = username;
+      saveUsers(users);
+      authMsg.textContent = `Welcome ${fullname}! Registered successfully with $100 wallet.`;
+      authMsg.style.color = '#00ff7f';
+    } else {
+      // Login existing user
+      currentUser = username;
+      authMsg.textContent = `Welcome back, ${users[username].fullname}!`;
+      authMsg.style.color = '#00ff7f';
+    }
+
+    // Clear form fields
+    document.getElementById('fullname').value = '';
+    document.getElementById('mobile').value = '';
+    document.getElementById('username').value = '';
+
+    document.getElementById('auth').classList.add('hidden');
+    document.getElementById('game').classList.remove('hidden');
+    updateBalance();
+  }
+
+  function updateBalance() {
+    const users = getUsers();
+    if (currentUser && users[currentUser]) {
+      document.getElementById('balance').textContent = users[currentUser].wallet.toFixed(2);
+    }
+  }
+
+  function addCash() {
+    const cash = prompt("Enter amount to add to wallet:");
+    const amount = parseFloat(cash);
+    if (!isNaN(amount) && amount > 0) {
+      let users = getUsers();
+      users[currentUser].wallet += amount;
+      saveUsers(users);
+      updateBalance();
+      alert(`$${amount.toFixed(2)} added to your wallet.`);
+    } else {
+      alert("Invalid amount.");
+    }
+  }
+
+  function withdrawCash() {
+    const cash = prompt("Enter amount to withdraw from wallet:");
+    const amount = parseFloat(cash);
+    let users = getUsers();
+    if (!isNaN(amount) && amount > 0 && amount <= users[currentUser].wallet) {
+      users[currentUser].wallet -= amount;
+      saveUsers(users);
+      updateBalance();
+      alert(`$${amount.toFixed(2)} withdrawn from your wallet.`);
+    } else {
+      alert("Invalid amount or insufficient balance.");
+    }
+  }
+
+  function placeBet() {
+    const betAmount = parseFloat(document.getElementById('betAmount').value);
+    const pickNumber = parseInt(document.getElementById('pickNumber').value);
+    const message = document.getElementById('message');
+    const winningNumberEl = document.getElementById('winningNumber');
+    const resultEl = document.getElementById('result');
+
+    if (isNaN(betAmount) || betAmount <= 0) {
+      message.textContent = "Please enter a valid bet amount.";
+      message.className = 'red';
+      return;
+    }
+
+    let users = getUsers();
+    if (betAmount > users[currentUser].wallet) {
+      message.textContent = "Insufficient wallet balance.";
+      message.className = 'red';
+      return;
+    }
+
+    // Deduct bet amount
+    users[currentUser].wallet -= betAmount;
+    saveUsers(users);
+    updateBalance();
+
+    // Generate random winning number between 1 and 6
+    const winningNumber = Math.floor(Math.random() * 6) + 1;
+
+    // Animate winning number
+    winningNumberEl.textContent = winningNumber;
+    winningNumberEl.classList.remove('hidden');
+    winningNumberEl.classList.remove('animate');
+    void winningNumberEl.offsetWidth; // trigger reflow to restart animation
+    winningNumberEl.classList.add('animate');
+
+    message.textContent = "Spinning...";
+    message.className = '';
+
+    resultEl.textContent = '';
+    resultEl.className = '';
+
+    setTimeout(() => {
+      if (pickNumber === winningNumber) {
+        const winAmount = betAmount * 6; // 6x payout
+        message.textContent = `Congratulations! You won $${winAmount.toFixed(2)}!`;
+        message.className = 'green';
+
+        // Add win amount to wallet
+        let users = getUsers();
+        users[currentUser].wallet += winAmount;
+        saveUsers(users);
+        updateBalance();
+
+        resultEl.textContent = "🎉🎉🎉";
+      } else {
+        message.textContent = `Sorry! You lost $${betAmount.toFixed(2)}. Try again!`;
+        message.className = 'red';
+        resultEl.textContent = "😞";
+      }
+    }, 2000);
+  }
+
+  function logout() {
+    currentUser = null;
+    document.getElementById('auth').classList.remove('hidden');
+    document.getElementById('game').classList.add('hidden');
+    document.getElementById('message').textContent = '';
+    document.getElementById('result').textContent = '';
+    document.getElementById('winningNumber').classList.add('hidden');
+    document.getElementById('authMsg').textContent = 'Logged out successfully.';
+    document.getElementById('authMsg').style.color = '#00ff7f';
+  }
+</script>
+
+</body>
+</html>
